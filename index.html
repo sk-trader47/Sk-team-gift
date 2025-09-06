@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>⚡ SK Team — Gift</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial;color:#00ffea}
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;background:black}
+.container{width:420px;background:rgba(0,0,0,0.55);border-radius:12px;padding:20px;z-index:1;position:relative;box-shadow:0 0 25px rgba(0,255,234,0.3);text-align:center}
+h2{margin-bottom:15px;color:#00ffea}
+input{width:100%;padding:12px;margin-bottom:12px;border-radius:8px;
+border:1px solid rgba(0,255,234,0.4);background:rgba(0,0,0,0.7);color:#00ffea;
+font-size:15px;outline:none;box-shadow:0 0 8px rgba(0,255,234,0.2) inset}
+button{background:linear-gradient(90deg,#ff00d4,#00ffea);padding:12px;color:#000;font-weight:bold;width:100%;border:none;cursor:pointer;border-radius:8px}
+button:hover{opacity:0.9}
+.result{margin-top:12px;background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:18px;color:#b8fff6}
+.announcement{margin-top:15px;padding:12px;border-radius:8px;
+background:linear-gradient(135deg,rgba(0,255,234,0.1),rgba(255,0,212,0.1));
+border:1px solid rgba(0,255,234,0.3);color:#ffcccc;font-size:13px;line-height:1.5}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<div class="container">
+  <h2>⚡ SK Team — Gift</h2>
+  <input id="uid" type="text" placeholder="Enter your UID">
+  <button onclick="generateRandom()">Get Surprise Number</button>
+  <div id="result" class="result"></div>
+
+  <!-- 📢 Announcement box -->
+  <div class="announcement">
+    ⚠️ Yah gift code sirf aur sirf <b>SK Team</b> ke liye hai.<br>
+    ✅ Jo log <u>hamare link</u> se honge sirf vahi log yah gift hasil kar sakte hain.
+  </div>
+</div>
+
+<script>
+// ⭐ Stars background
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+let stars=[];for(let i=0;i<200;i++){stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5});}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  for(let s of stars){ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,2*Math.PI);ctx.fill();
+    s.x+=s.dx;s.y+=s.dy;
+    if(s.x<0||s.x>canvas.width) s.dx*=-1;
+    if(s.y<0||s.y>canvas.height) s.dy*=-1;}
+}
+setInterval(drawStars,30);
+
+// ✅ Generate random number with UID lock (24h)
+function generateRandom(){
+  let uid=document.getElementById("uid").value.trim();
+  if(uid===""){
+    document.getElementById("result").innerHTML="⚠️ Please enter your UID first.";
+    return;
+  }
+
+  // Check if UID already used in last 24h
+  let stored = localStorage.getItem("uid_"+uid);
+  if(stored){
+    let data=JSON.parse(stored);
+    let now=Date.now();
+    let diff=(now-data.time)/(1000*60*60); // hours
+    if(diff<24){
+      document.getElementById("result").innerHTML="❌ This UID has already taken a gift. Try again after 24 hours.";
+      return;
+    }
+  }
+
+  // Generate random number
+  let randomNum=Math.floor(Math.random()*1000000); // 6-digit random number
+  document.getElementById("result").innerHTML="🎁 Surprise Gift Number for UID "+uid+" → <b>"+randomNum+"</b>";
+
+  // Save UID with timestamp
+  localStorage.setItem("uid_"+uid, JSON.stringify({time:Date.now(), number:randomNum}));
+}
+</script>
+</body>
+</html>
